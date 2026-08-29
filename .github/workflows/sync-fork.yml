@@ -25,5 +25,5 @@ jobs:
           git remote add upstream https://github.com/blackmatrix7/ios_rule_script.git
           git fetch upstream
           git checkout master
-          git merge upstream/master --no-edit
+          git merge upstream/master --allow-unrelated-histories --no-edit
           git push origin master
