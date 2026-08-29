@@ -2,23 +2,25 @@ name: Sync Fork Daily
 
 on:
   schedule:
-    # 每天国际标准时间 (UTC) 00:00 执行，相当于北京时间早上 8:00
-    # 你可以根据 Cron 表达式修改时间
+    # 每天国际标准时间 (UTC) 00:00 执行（北京时间早上 8:00）
     - cron: '0 0 * * *'
-  workflow_dispatch: # 允许你手动点击按钮触发同步
+  workflow_dispatch: # 允许手动触发
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # 授予写入权限以允许推送代码
     steps:
       - name: Checkout target repo
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
 
       - name: Sync Upstream
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
-        with:
-          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
-          upstream_sync_repo: blackmatrix7/ios_rule_script # ⚠️请改成原仓库的 拥有者/仓库名
-          upstream_sync_branch: master        # ⚠️原仓库的主分支名（通常是 main 或 master）
-          target_sync_branch: master          # ⚠️你自己的主分支名
-          test_mode: false
+        run: |
+          git remote add upstream https://github.com/blackmatrix7/ios_rule_script.git
+          git fetch upstream
+          git checkout master
+          git merge upstream/master --allow-unrelated-histories
+          git push origin master
