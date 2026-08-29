@@ -2,7 +2,7 @@ name: Sync Fork Daily
 
 on:
   schedule:
-    # 每天国际标准时间 (UTC) 00:00 执行（北京时间早上 8:00）
+    # 每天 UTC 00:00 执行
     - cron: '0 0 * * *'
   workflow_dispatch: # 允许手动触发
 
@@ -10,7 +10,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # 授予写入权限以允许推送代码
+      contents: write
     steps:
       - name: Checkout target repo
         uses: actions/checkout@v4
@@ -19,8 +19,11 @@ jobs:
 
       - name: Sync Upstream
         run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
           git remote add upstream https://github.com/blackmatrix7/ios_rule_script.git
           git fetch upstream
           git checkout master
-          git merge upstream/master --allow-unrelated-histories
+          git merge upstream/master --no-edit
           git push origin master
